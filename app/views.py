@@ -5,24 +5,29 @@ from django.db import models
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# from snippets.models import Snippet
-# from snippets.serializers import SnippetSerializer
+from django.shortcuts import render
+from .serializers import ConsultantSerializer
+from rest_framework import viewsets
+from django.core.serializers import serialize
+from django.http import JsonResponse
+from django.views.generic import View
 
-# def add_field(sender, **kwargs):
-#     """
-#     class_prepared signal handler that checks for the model named
-#     MyModel as the sender, and adds a CharField
-#     to it.
-#     """
-#     if sender.__name__ == "MyModel":
-#         field = models.CharField("New field", max_length=100)
-#         field.contribute_to_class(sender, "new_field")
-#
-# Consultant.connect(add_field)
 
-# @api_view(['GET', 'POST'])
+# @api_view(['GET'])
+class ConsultantView(viewsets.ModelViewSet):
+    serializer_class = ConsultantSerializer
+    queryset = Consultant.objects.all()
+
 def index(request):
     result = Consultant.objects.values()
+    # l = request.user.groups.values_list('name', flat=True)  # QuerySet Object
+    # l_as_list = list(l)
+    # if user.groups.filter(name='groupname').exists():
+    # # Action if existing
+    #
+    # else:
+    # # Action if not existing
+    # print(l_as_list, request.user.groups)
     # Consultant.add_to_class(
     #     '%s_title',
     #     models.CharField(max_length=255, blank=True, default='')
@@ -52,5 +57,6 @@ def index(request):
         columnData.append({'field':eachField.name})
     context["headers"] = columnData
     context["values"] = list_result
+    context["user"] = request.user
 
     return HttpResponse(template.render(context, request))

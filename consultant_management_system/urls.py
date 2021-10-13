@@ -15,13 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include 
-from app.views import index
+from app.views import index, ConsultantView
 from django.conf import settings
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r'consultant', ConsultantView, 'consultant')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('api/', include(router.urls)),
 ]
 
 if settings.DEBUG:

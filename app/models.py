@@ -4,7 +4,7 @@ from django.db import models
 
 # Create your models here.
 class Consultant(models.Model):
-    consultant_name = models.CharField("Consultant Name",max_length=100)
+    consultant_name = models.CharField("Consultant Name", max_length=100)
     uid = models.CharField("UID", max_length=100)
     first_name = models.CharField("First Name",max_length=100)
     last_name = models.CharField("Last Name", max_length=100)

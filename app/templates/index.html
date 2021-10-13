@@ -1,7 +1,7 @@
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
-    <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
-    <script src="https://unpkg.com/@ag-grid-community/all-modules@26.0.0/dist/ag-grid-community.min.js"></script>
+<!--    <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>-->
+<!--    <script src="https://unpkg.com/@ag-grid-community/all-modules@26.0.0/dist/ag-grid-community.min.js"></script>-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style media="only screen">
       .action-button {
@@ -49,6 +49,16 @@
         margin: 10px;
        }
     </style>
+    <meta charset="utf-8"/>
+      <link rel="icon" href="/favicon.ico"/>
+      <meta name="viewport" content="width=device-width,initial-scale=1"/>
+      <meta name="theme-color" content="#000000"/>
+      <meta name="description" content="Web site created using create-react-app"/>
+      <link rel="apple-touch-icon" href="/logo192.png"/>
+      <link rel="manifest" href="/static/manifest.json"/>
+      <title>React App</title>
+      <link href="/static/css/2.588ad167.chunk.css" rel="stylesheet">
+      <link href="/static/css/main.0e351f2f.chunk.css" rel="stylesheet">
 </head>
 <body>
 <center>
@@ -57,160 +67,168 @@
 
   <h3 style="padding-top:30px;"><u>Employees DataTable<u></h3></center>
     <div class="container-fluid">
-        <div>
-            <button
-                id="addColumn"
-                class="action-button edit"
-                data-action="addColumn">
-                    Add Column
-            </button>
-        </div >
-        <div>
-            <input
-                id="columnName"
-                class="textbox hide"
-                type="text"
-                placeholder="Please enter column name"
-                required
-            />
-            <input
-                id="columnDataType"
-                class="textbox hide"
-                type="text"
-                placeholder="Please enter data type of column"
-                required
-            />
-            <button
-                id="save"
-                class="action-button edit hide"
-                data-action="save hide">
-                    Save
-            </button>
-        </div>
-    <div id="myGrid" style="height: 100%; width:100%;" class="ag-theme-alpine"></div>
+<!--        <div>-->
+<!--            <button-->
+<!--                id="addColumn"-->
+<!--                class="action-button edit"-->
+<!--                data-action="addColumn">-->
+<!--                    Add Column-->
+<!--            </button>-->
+<!--        </div >-->
+<!--        <div>-->
+<!--            <input-->
+<!--                id="columnName"-->
+<!--                class="textbox hide"-->
+<!--                type="text"-->
+<!--                placeholder="Please enter column name"-->
+<!--                required-->
+<!--            />-->
+<!--            <input-->
+<!--                id="columnDataType"-->
+<!--                class="textbox hide"-->
+<!--                type="text"-->
+<!--                placeholder="Please enter data type of column"-->
+<!--                required-->
+<!--            />-->
+<!--            <button-->
+<!--                id="save"-->
+<!--                class="action-button edit hide"-->
+<!--                data-action="save hide">-->
+<!--                    Save-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    <div id="myGrid" style="height: 100%; width:100%;" class="ag-theme-alpine"></div>-->
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+      <div id="root"></div>
     </div>
 
-    <script type="text/javascript" charset="utf-8">
-    function actionCellRenderer(params) {
-      let eGui = document.createElement("div");
-      let editingCells = params.api.getEditingCells();
-      // checks if the rowIndex matches in at least one of the editing cells
-      let isCurrentRowEditing = editingCells.some((cell) => {
-        return cell.rowIndex === params.node.rowIndex;
-        });
-      if (isCurrentRowEditing) {
-          eGui.innerHTML = `
-              <button
-                class="action-button update"
-                data-action="update">
-                    update
-              </button>
-              <button
-                class="action-button cancel"
-                data-action="cancel">
-                    cancel
-              </button>
-              `;
-      } else {
-      eGui.innerHTML = `
-          <button
-            class="action-button edit"
-            data-action="edit">
-              edit
-            </button>`;
-    }
-    return eGui;
-  }
+<!--    <script type="text/javascript" charset="utf-8">-->
+<!--    function actionCellRenderer(params) {-->
+<!--      let eGui = document.createElement("div");-->
+<!--      let editingCells = params.api.getEditingCells();-->
+<!--      // checks if the rowIndex matches in at least one of the editing cells-->
+<!--      let isCurrentRowEditing = editingCells.some((cell) => {-->
+<!--        return cell.rowIndex === params.node.rowIndex;-->
+<!--        });-->
+<!--      if (isCurrentRowEditing) {-->
+<!--          eGui.innerHTML = `-->
+<!--              <button-->
+<!--                class="action-button update"-->
+<!--                data-action="update">-->
+<!--                    update-->
+<!--              </button>-->
+<!--              <button-->
+<!--                class="action-button cancel"-->
+<!--                data-action="cancel">-->
+<!--                    cancel-->
+<!--              </button>-->
+<!--              `;-->
+<!--      } else {-->
+<!--      eGui.innerHTML = `-->
+<!--          <button-->
+<!--            class="action-button edit"-->
+<!--            data-action="edit">-->
+<!--              edit-->
+<!--            </button>`;-->
+<!--    }-->
+<!--    return eGui;-->
+<!--  }-->
 
-    const columnDefs = {{headers|safe}};
+<!--    const columnDefs = {{headers|safe}};-->
+<!--    const user = `{{user|safe}}`;-->
+<!--    let myStorage = window.sessionStorage;-->
+<!--    sessionStorage.setItem('user', user);-->
 
-    columnDefs.push({
-      headerName: "action",
-      minWidth: 150,
-      cellRenderer: actionCellRenderer,
-      editable: false,
-      colId: "action"
-    })
+<!--    columnDefs.push({-->
+<!--      headerName: "action",-->
+<!--      minWidth: 150,-->
+<!--      cellRenderer: actionCellRenderer,-->
+<!--      editable: false,-->
+<!--      colId: "action"-->
+<!--    })-->
 
-    // specify the data
-    const rowData = {{values|safe}};
+<!--    // specify the data-->
+<!--    const rowData = {{values|safe}};-->
 
-    // let the grid know which columns and what data to use
-    const gridOptions = {
-      suppressClickEdit: true,
+<!--    // let the grid know which columns and what data to use-->
+<!--    const gridOptions = {-->
+<!--      suppressClickEdit: true,-->
 
-      onCellClicked(params) {
-          // Handle click event for action cells
-          if (params.column.colId === "action" && params.event.target.dataset.action) {
-            let action = params.event.target.dataset.action;
+<!--      onCellClicked(params) {-->
+<!--          // Handle click event for action cells-->
+<!--          if (params.column.colId === "action" && params.event.target.dataset.action) {-->
+<!--            let action = params.event.target.dataset.action;-->
 
-            if (action === "edit") {
-              params.api.startEditingCell({
-                rowIndex: params.node.rowIndex,
-                colKey: params.columnApi.getDisplayedCenterColumns()[0].colId
-              });
-            }
+<!--            if (action === "edit") {-->
+<!--              params.api.startEditingCell({-->
+<!--                rowIndex: params.node.rowIndex,-->
+<!--                colKey: params.columnApi.getDisplayedCenterColumns()[0].colId-->
+<!--              });-->
+<!--            }-->
 
-            if (action === "update") {
-              params.api.stopEditing(false);
-            }
+<!--            if (action === "update") {-->
+<!--              params.api.stopEditing(false);-->
+<!--            }-->
 
-            if (action === "cancel") {
-              params.api.stopEditing(true);
-            }
-          }
-      },
+<!--            if (action === "cancel") {-->
+<!--              params.api.stopEditing(true);-->
+<!--            }-->
+<!--          }-->
+<!--      },-->
 
-      onRowEditingStarted: (params) => {
-          params.api.refreshCells({
-            columns: ["action"],
-            rowNodes: [params.node],
-            force: true
-        });
-      },
+<!--      onRowEditingStarted: (params) => {-->
+<!--          params.api.refreshCells({-->
+<!--            columns: ["action"],-->
+<!--            rowNodes: [params.node],-->
+<!--            force: true-->
+<!--        });-->
+<!--      },-->
 
-      onRowEditingStopped: (params) => {
-        params.api.refreshCells({
-          columns: ["action"],
-          rowNodes: [params.node],
-          force: true
-        });
-      },
+<!--      onRowEditingStopped: (params) => {-->
+<!--        params.api.refreshCells({-->
+<!--          columns: ["action"],-->
+<!--          rowNodes: [params.node],-->
+<!--          force: true-->
+<!--        });-->
+<!--      },-->
 
-      editType: "fullRow",
-      columnDefs: columnDefs,
-      rowData: rowData,
-      defaultColDef: {
-        editable:true
-      },
-    };
+<!--      editType: "fullRow",-->
+<!--      columnDefs: columnDefs,-->
+<!--      rowData: rowData,-->
+<!--      defaultColDef: {-->
+<!--        editable:true-->
+<!--      },-->
+<!--    };-->
 
-    // setup the grid after the page has finished loading
-    document.addEventListener('DOMContentLoaded', () => {
-        const gridDiv = document.querySelector('#myGrid');
-        gridDiv.style.setProperty('width', '100%');
-        gridDiv.style.setProperty('height', '100%');
-        new agGrid.Grid(gridDiv, gridOptions);
-    });
-    document.getElementById('addColumn').addEventListener('click', function() {
-        const columnName = document.getElementById('columnName');
-        const columnDataType = document.getElementById('columnDataType');
-        const save = document.getElementById('save');
-        columnName.classList.remove('hide');
-        columnName.classList.add('show');
-        columnDataType.classList.add('hide');
-        columnDataType.classList.add('show');
-        save.classList.remove('hide');
-        save.classList.add('show');
-    });
-    document.getElementById('save').addEventListener('click', function() {
-        const columnName = document.getElementById('columnName');
-        const columnDataType = document.getElementById('columnDataType');
-        gridOptions.api.setColumnDefs([...columnDefs, ...[{
-        headerName: columnName?.value, field: columnName?.value
-        }]])
-    });
-  </script>
+<!--    // setup the grid after the page has finished loading-->
+<!--    document.addEventListener('DOMContentLoaded', () => {-->
+<!--        const gridDiv = document.querySelector('#myGrid');-->
+<!--        gridDiv.style.setProperty('width', '100%');-->
+<!--        gridDiv.style.setProperty('height', '100%');-->
+<!--        new agGrid.Grid(gridDiv, gridOptions);-->
+<!--    });-->
+<!--    document.getElementById('addColumn').addEventListener('click', function() {-->
+<!--        const columnName = document.getElementById('columnName');-->
+<!--        const columnDataType = document.getElementById('columnDataType');-->
+<!--        const save = document.getElementById('save');-->
+<!--        columnName.classList.remove('hide');-->
+<!--        columnName.classList.add('show');-->
+<!--        columnDataType.classList.add('hide');-->
+<!--        columnDataType.classList.add('show');-->
+<!--        save.classList.remove('hide');-->
+<!--        save.classList.add('show');-->
+<!--    });-->
+<!--    document.getElementById('save').addEventListener('click', function() {-->
+<!--        const columnName = document.getElementById('columnName');-->
+<!--        const columnDataType = document.getElementById('columnDataType');-->
+<!--        gridOptions.api.setColumnDefs([...columnDefs, ...[{-->
+<!--        headerName: columnName?.value, field: columnName?.value-->
+<!--        }]])-->
+<!--    });-->
+
+<!--    </script>-->
+{% load static %}
+    <script>!function(e){function r(r){for(var n,a,i=r[0],c=r[1],l=r[2],f=0,s=[];f<i.length;f++)a=i[f],Object.prototype.hasOwnProperty.call(o,a)&&o[a]&&s.push(o[a][0]),o[a]=0;for(n in c)Object.prototype.hasOwnProperty.call(c,n)&&(e[n]=c[n]);for(p&&p(r);s.length;)s.shift()();return u.push.apply(u,l||[]),t()}function t(){for(var e,r=0;r<u.length;r++){for(var t=u[r],n=!0,i=1;i<t.length;i++){var c=t[i];0!==o[c]&&(n=!1)}n&&(u.splice(r--,1),e=a(a.s=t[0]))}return e}var n={},o={1:0},u=[];function a(r){if(n[r])return n[r].exports;var t=n[r]={i:r,l:!1,exports:{}};return e[r].call(t.exports,t,t.exports,a),t.l=!0,t.exports}a.e=function(e){var r=[],t=o[e];if(0!==t)if(t)r.push(t[2]);else{var n=new Promise((function(r,n){t=o[e]=[r,n]}));r.push(t[2]=n);var u,i=document.createElement("script");i.charset="utf-8",i.timeout=120,a.nc&&i.setAttribute("nonce",a.nc),i.src=function(e){return a.p+"static/js/"+({}[e]||e)+".chunk.js"}(e);var c=new Error;u=function(r){i.onerror=i.onload=null,clearTimeout(l);var t=o[e];if(0!==t){if(t){var n=r&&("load"===r.type?"missing":r.type),u=r&&r.target&&r.target.src;c.message="Loading chunk "+e+" failed.\n("+n+": "+u+")",c.name="ChunkLoadError",c.type=n,c.request=u,t[1](c)}o[e]=void 0}};var l=setTimeout((function(){u({type:"timeout",target:i})}),12e4);i.onerror=i.onload=u,document.head.appendChild(i)}return Promise.all(r)},a.m=e,a.c=n,a.d=function(e,r,t){a.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},a.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},a.t=function(e,r){if(1&r&&(e=a(e)),8&r)return e;if(4&r&&"object"==typeof e&&e&&e.__esModule)return e;var t=Object.create(null);if(a.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:e}),2&r&&"string"!=typeof e)for(var n in e)a.d(t,n,function(r){return e[r]}.bind(null,n));return t},a.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return a.d(r,"a",r),r},a.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},a.p="/",a.oe=function(e){throw console.error(e),e};var i=this.webpackJsonpreactapp=this.webpackJsonpreactapp||[],c=i.push.bind(i);i.push=r,i=i.slice();for(var l=0;l<i.length;l++)r(i[l]);var p=c;t()}([])</script><script src="/static/js/2.chunk.js"></script><script src="/static/js/main.chunk.js"></script>
 {% else %}
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">Log In</a>
