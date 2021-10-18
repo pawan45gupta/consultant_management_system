@@ -57,6 +57,6 @@ def index(request):
         columnData.append({'field':eachField.name})
     context["headers"] = columnData
     context["values"] = list_result
-    context["user"] = request.user
+    context["userGroup"] = request.user.groups.values_list('name', flat=True)
 
     return HttpResponse(template.render(context, request))
