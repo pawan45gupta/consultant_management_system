@@ -7,13 +7,14 @@ import Button from "react-bootstrap/Button";
 import API_END_POINT from "./config";
 import axios from "axios";
 import ConfirmModal from "./Components/ConfirmModal";
+import AddConsultantModal from "./Components/AddConsultantModal";
 
 function App() {
   const [rowData, setRowData] = useState([]);
   const [pageState, setPageState] = useState({
     userGroup: "superUser",
   });
-  function readCookie(name) {
+  const readCookie = (name) => {
     var nameEQ = name + "=";
     var ca = document.cookie.split(";");
     for (var i = 0; i < ca.length; i++) {
@@ -22,7 +23,7 @@ function App() {
       if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
-  }
+  };
 
   const csrftoken = readCookie("csrftoken");
   const headers = { "X-CSRFToken": csrftoken };
@@ -31,6 +32,7 @@ function App() {
   const [gridColumnApi, setGridColumnApi] = useState(null);
   const [show, setShow] = useState(false);
   const [showRemoveButton, setShowRemoveButton] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const onGridReady = (params) => {
     setGridApi(params.api);
@@ -91,33 +93,47 @@ function App() {
     console.log(window.sessionStorage.getItem("userGroup"));
   }, []);
 
-  const addConsultant = async () => {
-    const item = {
-      consultant_name: "Gupta, Pawan",
-      uid: "c_adnant",
-      first_name: " Adnan",
-      last_name: "Tanwir",
-      eda_vendor: "Cadence",
-      consultant_type: "Applications Engineer",
-      technology_focus: "Functional Verification",
-      access_type: "Badge and System",
-      consultant_start_date: "2015-03-23",
-      proposed_end_date: "2024-12-30",
-      qcm_consultant_current_status: "Active",
-      off_board_consultant: null,
-      current_vpn_status: "Enabled",
-      consultant_location: null,
-      current_consultant_sponsor: "Huang, Joe",
-      project: "",
-      justificaiton_for_remaining_onboarded: null,
-      approval_for_justification: null,
-      approval_comments: null,
-    };
+  const addConsultant = () => {
+    setShowAddModal(true);
+  };
+
+  const saveConsultant = async () => {
+    // const item = {
+    //   consultant_name: "Gupta, Pawan",
+    //   uid: "c_adnant",
+    //   first_name: " Adnan",
+    //   last_name: "Tanwir",
+    //   eda_vendor: "Cadence",
+    //   consultant_type: "Applications Engineer",
+    //   technology_focus: "Functional Verification",
+    //   access_type: "Badge and System",
+    //   consultant_start_date: "2015-03-23",
+    //   proposed_end_date: "2024-12-30",
+    //   qcm_consultant_current_status: "Active",
+    //   off_board_consultant: null,
+    //   current_vpn_status: "Enabled",
+    //   consultant_location: null,
+    //   current_consultant_sponsor: "Huang, Joe",
+    //   project: "",
+    //   justificaiton_for_remaining_onboarded: null,
+    //   approval_for_justification: null,
+    //   approval_comments: null,
+    // };
+    let item = {};
+    Object.keys(rowData[0]).forEach(col => {
+      if(col !== 'id') {
+       item[col] = document.getElementById(col) && document.getElementById(col).value;
+      }
+    });
+    
     const res = await axios.post(`${API_END_POINT}consultant/`, item, {
       headers: headers,
     });
-    console.log(res.data);
-  };
+    console.log(res);
+    setShowAddModal(false);
+  }
+
+  
 
   const removeConsultant = () => {
     setShow(true);
@@ -168,14 +184,15 @@ function App() {
     gridApi.exportDataAsCsv();
   };
 
+  const handleAddModalClose = () => setShowAddModal(false);
+
   return (
     <div className="App">
-      {console.log(pageState)}
       {pageState.userGroup === "superUser" ? (
         <div>
-          {/* <Button variant="primary" className={"m-2"} onClick={addConsultant}>
+          <Button variant="primary" className={"m-2"} onClick={addConsultant}>
             Add Consultant
-          </Button> */}
+          </Button>
           {showRemoveButton && (
             <Button
               variant="danger"
@@ -186,14 +203,21 @@ function App() {
             </Button>
           )}
           <Button variant="primary" className="m-2" onClick={exportToCsv}>
-          Export to CSV
-        </Button>
+            Export to CSV
+          </Button>
         </div>
       ) : null}
       <ConfirmModal
         show={show}
         handleClose={handleClose}
         handleDelete={handleDelete}
+        handleAdd={addConsultant}
+      />
+      <AddConsultantModal
+        show={showAddModal}
+        handleClose={handleAddModalClose}
+        handleAdd={saveConsultant}
+        rowData={rowData}
       />
       <div
         className="ag-theme-alpine"
