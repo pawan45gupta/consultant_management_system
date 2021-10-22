@@ -199,7 +199,7 @@ function App() {
 
   return (
     <div className="App">
-      {pageState.userGroup === "superUser" ? (
+      {/* {pageState.userGroup === "superUser" ? ( */}
         <div>
           <Button variant="primary" className={"m-2"} onClick={addConsultant}>
             Add Consultant
@@ -217,7 +217,7 @@ function App() {
             Export to CSV
           </Button>
         </div>
-      ) : null}
+      {/* ) : null} */}
       <ConfirmModal
         show={show}
         handleClose={handleClose}
