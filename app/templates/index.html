@@ -29,7 +29,7 @@
 <script>
     const userGroup = `{{userGroup|safe}}`;
     let myStorage = window.sessionStorage;
-    sessionStorage.setItem('userGroup', userGroup === "<QuerySet []>" ? "superUser" : userGroup);
+    sessionStorage.setItem('userGroup', userGroup === "<QuerySet []>" ? "superUser" : userGroup.replace("<QuerySet ['", "").replace("']>", ""));
 </script>
 {% load static %}
     <script>

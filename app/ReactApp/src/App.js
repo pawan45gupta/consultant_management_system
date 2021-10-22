@@ -79,17 +79,28 @@ function App() {
     return element;
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      const res = await fetch(`${API_END_POINT}consultant/`);
-      const data = await res.json();
-      console.log(data);
-      setRowData(data);
+  const fetchData = async () => {
+    const res = await fetch(`${API_END_POINT}consultant/`);
+    let data = await res.json();
+    console.log(data);
+    const userGroup = window.sessionStorage.getItem("userGroup");
+    console.log('userGroup', userGroup, userGroup !== "superUser");
+    if (userGroup !== "superUser") {
+      const groupArray = userGroup.split("_");
+      const vendorName = groupArray && groupArray.length > 0 && groupArray[0];
+      console.log("vendorName", userGroup, vendorName);
+      data = data.filter(
+        (row) => row?.eda_vendor?.toLowerCase() === vendorName?.toLowerCase()
+      );
     }
-    fetchData();
+    setRowData(data);
+  };
+
+  useEffect(() => {
     setPageState({
       userGroup: window.sessionStorage.getItem("userGroup"),
     });
+    fetchData();
     console.log(window.sessionStorage.getItem("userGroup"));
   }, []);
 
@@ -120,20 +131,22 @@ function App() {
     //   approval_comments: null,
     // };
     let item = {};
-    Object.keys(rowData[0]).forEach(col => {
-      if(col !== 'id') {
-       item[col] = document.getElementById(col) && document.getElementById(col).value;
+    Object.keys(rowData[0]).forEach((col) => {
+      if (col !== "id") {
+        item[col] =
+          document.getElementById(col) && document.getElementById(col).value;
       }
     });
-    
+
     const res = await axios.post(`${API_END_POINT}consultant/`, item, {
       headers: headers,
     });
-    console.log(res);
-    setShowAddModal(false);
-  }
-
-  
+    console.log("update", res);
+    if (res.status === 201) {
+      setShowAddModal(false);
+      fetchData();
+    }
+  };
 
   const removeConsultant = () => {
     setShow(true);
@@ -173,9 +186,7 @@ function App() {
         headers: headers,
       }
     );
-    res = await fetch(`${API_END_POINT}consultant/`);
-    const data = await res.json();
-    setRowData(data);
+    fetchData();
     setShow(false);
     setShowRemoveButton(false);
   };

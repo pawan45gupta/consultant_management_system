@@ -39,10 +39,10 @@ const AddConsultantModal = ({ show, handleClose, handleAdd, rowData }) => {
                       <InputGroup hasValidation>
                         <Form.Control
                           id={col}
-                          type="text"
+                          type={col === 'consultant_start_date' || col === 'proposed_end_date' ? 'date': 'string' }
                           placeholder={`Enter ${col}`}
                           required
-                          defaultValue={"test"}
+                          // defaultValue={"test"}
                         />
                         <Form.Control.Feedback type="invalid">
                           {`Please enter ${col}`}
