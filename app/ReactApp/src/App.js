@@ -13,6 +13,8 @@ function App() {
   const [rowData, setRowData] = useState([]);
   const [pageState, setPageState] = useState({
     userGroup: "superUser",
+    originalData: null,
+    originalId: -1,
   });
   const readCookie = (name) => {
     var nameEQ = name + "=";
@@ -39,15 +41,47 @@ function App() {
     setGridColumnApi(params.columnApi);
   };
 
-  const onCellValueChanged = (event) => {
+  const findIndexById = (arr, id) => {
+    const requiredIndex = arr.findIndex((el) => {
+      return el.id === id;
+    });
+    return requiredIndex;
+  };
+
+  const updateValue = async (data) => {
+    return await axios.patch(
+      `${API_END_POINT}consultant/${pageState?.originalId}/`,
+      data,
+      {
+        headers: headers,
+      }
+    );
+  };
+
+  const onCellValueChanged = async (event) => {
     console.log(event);
     console.log(
       "onCellValueChanged: " + event.colDef.field + " = " + event.newValue
     );
     if (event.data.id) {
-      axios.put(`${API_END_POINT}consultant/${event.data.id}/`, event.data, {
-        headers: headers,
-      });
+      const requiredIndex = findIndexById(
+        pageState?.originalData?.rows,
+        event.data.id
+      );
+      requiredIndex !== -1 &&
+        pageState?.originalData?.rows.splice(requiredIndex, 1);
+      pageState?.originalData?.rows.splice(requiredIndex, 0, event.data);
+      // const rows = [...pageState?.originalData?.rows, ...[event.data]];
+      const objData = {
+        id: pageState?.originalId,
+        data: JSON.stringify({
+          columns: pageState?.originalData?.columns,
+          rows: pageState?.originalData?.rows,
+        }),
+      };
+
+      await updateValue(objData);
+      fetchData();
     }
   };
 
@@ -82,18 +116,27 @@ function App() {
   const fetchData = async () => {
     const res = await fetch(`${API_END_POINT}consultant/`);
     let data = await res.json();
+    const originalData = data;
     console.log(data);
     const userGroup = window.sessionStorage.getItem("userGroup");
-    console.log('userGroup', userGroup, userGroup !== "superUser");
+    data = JSON.parse(data && data[0]?.data)?.rows;
+    console.log("userGroup", userGroup, userGroup !== "superUser");
     if (userGroup !== "superUser") {
       const groupArray = userGroup.split("_");
       const vendorName = groupArray && groupArray.length > 0 && groupArray[0];
       console.log("vendorName", userGroup, vendorName);
       data = data.filter(
-        (row) => row?.eda_vendor?.toLowerCase() === vendorName?.toLowerCase()
+        (row) => row["EDA Vendor"]?.toLowerCase() === vendorName?.toLowerCase()
       );
     }
     setRowData(data);
+    setPageState({
+      ...pageState,
+      ...{
+        originalData: JSON.parse(originalData && originalData[0]?.data),
+        originalId: JSON.parse(originalData && originalData[0]?.id),
+      },
+    });
   };
 
   useEffect(() => {
@@ -108,28 +151,11 @@ function App() {
     setShowAddModal(true);
   };
 
+  const addColumn = () => {
+    setShowAddModal(true);
+  };
+
   const saveConsultant = async () => {
-    // const item = {
-    //   consultant_name: "Gupta, Pawan",
-    //   uid: "c_adnant",
-    //   first_name: " Adnan",
-    //   last_name: "Tanwir",
-    //   eda_vendor: "Cadence",
-    //   consultant_type: "Applications Engineer",
-    //   technology_focus: "Functional Verification",
-    //   access_type: "Badge and System",
-    //   consultant_start_date: "2015-03-23",
-    //   proposed_end_date: "2024-12-30",
-    //   qcm_consultant_current_status: "Active",
-    //   off_board_consultant: null,
-    //   current_vpn_status: "Enabled",
-    //   consultant_location: null,
-    //   current_consultant_sponsor: "Huang, Joe",
-    //   project: "",
-    //   justificaiton_for_remaining_onboarded: null,
-    //   approval_for_justification: null,
-    //   approval_comments: null,
-    // };
     let item = {};
     Object.keys(rowData[0]).forEach((col) => {
       if (col !== "id") {
@@ -137,12 +163,29 @@ function App() {
           document.getElementById(col) && document.getElementById(col).value;
       }
     });
+    if (
+      pageState?.originalData?.rows &&
+      pageState?.originalData?.rows.length > 0
+    ) {
+      item["id"] =
+        pageState?.originalData?.rows[pageState?.originalData?.rows.length - 1]
+          ?.id + 1;
+    } else {
+      item["id"] = 1;
+    }
 
-    const res = await axios.post(`${API_END_POINT}consultant/`, item, {
-      headers: headers,
-    });
+    pageState?.originalData?.rows.push(item);
+
+    const objData = {
+      id: pageState?.originalId,
+      data: JSON.stringify({
+        columns: pageState?.originalData?.columns,
+        rows: pageState?.originalData?.rows,
+      }),
+    };
+    const res = await updateValue(objData);
     console.log("update", res);
-    if (res.status === 201) {
+    if (res.status === 200) {
       setShowAddModal(false);
       fetchData();
     }
@@ -180,12 +223,20 @@ function App() {
   const handleClose = () => setShow(false);
   const handleDelete = async () => {
     var selectedRows = gridApi.getSelectedRows();
-    let res = await axios.delete(
-      `${API_END_POINT}consultant/${selectedRows[0]?.id}`,
-      {
-        headers: headers,
-      }
+    const requiredIndex = findIndexById(
+      pageState?.originalData?.rows,
+      selectedRows[0]?.id
     );
+    requiredIndex !== -1 &&
+      pageState?.originalData?.rows.splice(requiredIndex, 1);
+    const objData = {
+      id: pageState?.originalId,
+      data: JSON.stringify({
+        columns: pageState?.originalData?.columns,
+        rows: pageState?.originalData?.rows,
+      }),
+    };
+    await updateValue(objData);
     fetchData();
     setShow(false);
     setShowRemoveButton(false);
@@ -197,26 +248,34 @@ function App() {
 
   const handleAddModalClose = () => setShowAddModal(false);
 
+  console.log(
+    "rowData",
+    rowData,
+    "keys",
+    Object.keys(rowData.length > 0 && rowData[0]),
+    "pageState",
+    pageState?.originalData
+  );
+
   return (
     <div className="App">
       {/* {pageState.userGroup === "superUser" ? ( */}
-        <div>
-          <Button variant="primary" className={"m-2"} onClick={addConsultant}>
-            Add Consultant
+      <div>
+        <Button variant="primary" className={"m-2"} onClick={addConsultant}>
+          Add Consultant
+        </Button>
+        <Button variant="primary" className={"m-2"} onClick={addColumn}>
+          Add Column
+        </Button>
+        {showRemoveButton && (
+          <Button variant="danger" className={"m-2"} onClick={removeConsultant}>
+            Remove Consultant
           </Button>
-          {showRemoveButton && (
-            <Button
-              variant="danger"
-              className={"m-2"}
-              onClick={removeConsultant}
-            >
-              Remove Consultant
-            </Button>
-          )}
-          <Button variant="primary" className="m-2" onClick={exportToCsv}>
-            Export to CSV
-          </Button>
-        </div>
+        )}
+        <Button variant="primary" className="m-2" onClick={exportToCsv}>
+          Export to CSV
+        </Button>
+      </div>
       {/* ) : null} */}
       <ConfirmModal
         show={show}
@@ -251,16 +310,16 @@ function App() {
           onSelectionChanged={onSelectionChanged}
           suppressExcelExport={true}
         >
-          {rowData &&
-            rowData.length > 0 &&
-            Object.keys(rowData[0])?.map((val) => (
-              <AgGridColumn
-                field={val}
-                pinned={
-                  val === "id" || val === "consultant_name" ? "left" : null
-                }
-              ></AgGridColumn>
-            ))}
+          {pageState?.originalData?.columns?.map((val) => (
+            <AgGridColumn
+              field={val?.name}
+              pinned={
+                val?.name === "id" || val?.name === "Consultant Name"
+                  ? "left"
+                  : null
+              }
+            ></AgGridColumn>
+          ))}
           {/* <AgGridColumn
             field={"Action"}
             editable={false}

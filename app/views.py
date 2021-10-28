@@ -1,22 +1,14 @@
 from django.template import loader
-from app.models import Consultant
+from app.models import Consultant, CustomModel
 from django.http import HttpResponse
-from django.db import models
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from django.shortcuts import render
-from .serializers import ConsultantSerializer
+from .serializers import ConsultantSerializer, CustomModelSerializer
 from rest_framework import viewsets
-from django.core.serializers import serialize
-from django.http import JsonResponse
-from django.views.generic import View
 
 
 # @api_view(['GET'])
 class ConsultantView(viewsets.ModelViewSet):
-    serializer_class = ConsultantSerializer
-    queryset = Consultant.objects.all()
+    serializer_class = CustomModelSerializer
+    queryset = CustomModel.objects.all()
 
 def index(request):
     result = Consultant.objects.values()
