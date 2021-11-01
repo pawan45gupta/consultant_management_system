@@ -8,6 +8,7 @@ import API_END_POINT from "./config";
 import axios from "axios";
 import ConfirmModal from "./Components/ConfirmModal";
 import AddConsultantModal from "./Components/AddConsultantModal";
+import AddColumnModal from "./Components/AddColumnModal";
 
 function App() {
   const [rowData, setRowData] = useState([]);
@@ -35,6 +36,7 @@ function App() {
   const [show, setShow] = useState(false);
   const [showRemoveButton, setShowRemoveButton] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddColumnModal, setShowAddColumnModal] = useState(false);
 
   const onGridReady = (params) => {
     setGridApi(params.api);
@@ -71,7 +73,6 @@ function App() {
       requiredIndex !== -1 &&
         pageState?.originalData?.rows.splice(requiredIndex, 1);
       pageState?.originalData?.rows.splice(requiredIndex, 0, event.data);
-      // const rows = [...pageState?.originalData?.rows, ...[event.data]];
       const objData = {
         id: pageState?.originalId,
         data: JSON.stringify({
@@ -152,15 +153,15 @@ function App() {
   };
 
   const addColumn = () => {
-    setShowAddModal(true);
+    setShowAddColumnModal(true);
   };
 
   const saveConsultant = async () => {
     let item = {};
-    Object.keys(rowData[0]).forEach((col) => {
-      if (col !== "id") {
-        item[col] =
-          document.getElementById(col) && document.getElementById(col).value;
+    pageState?.originalData?.columns.forEach((col) => {
+      if (col?.name !== "id") {
+        item[col?.name] =
+          document.getElementById(col?.name) && document.getElementById(col?.name).value;
       }
     });
     if (
@@ -190,6 +191,32 @@ function App() {
       fetchData();
     }
   };
+
+  const addNewColumn = async () => {
+    let item = {
+      "name": null,
+      "type": null,
+      "validations":[]
+    };
+    item["name"] = document.getElementById("ColumnName") && document.getElementById("ColumnName")?.value;
+    item["type"] = document.getElementById("type") && document.getElementById("type")?.value;
+
+    pageState?.originalData?.columns.push(item);
+
+    const objData = {
+      id: pageState?.originalId,
+      data: JSON.stringify({
+        columns: pageState?.originalData?.columns,
+        rows: pageState?.originalData?.rows,
+      }),
+    };
+    const res = await updateValue(objData);
+    console.log("update", res);
+    if (res.status === 200) {
+      setShowAddColumnModal(false);
+      fetchData();
+    }
+  }
 
   const removeConsultant = () => {
     setShow(true);
@@ -248,6 +275,8 @@ function App() {
 
   const handleAddModalClose = () => setShowAddModal(false);
 
+  const handleAddColumnModalClose = () => setShowAddColumnModal(false);
+
   console.log(
     "rowData",
     rowData,
@@ -259,13 +288,12 @@ function App() {
 
   return (
     <div className="App">
-      {/* {pageState.userGroup === "superUser" ? ( */}
       <div>
         <Button variant="primary" className={"m-2"} onClick={addConsultant}>
           Add Consultant
         </Button>
         <Button variant="primary" className={"m-2"} onClick={addColumn}>
-          Add Column
+          Add New Column
         </Button>
         {showRemoveButton && (
           <Button variant="danger" className={"m-2"} onClick={removeConsultant}>
@@ -276,7 +304,6 @@ function App() {
           Export to CSV
         </Button>
       </div>
-      {/* ) : null} */}
       <ConfirmModal
         show={show}
         handleClose={handleClose}
@@ -287,7 +314,12 @@ function App() {
         show={showAddModal}
         handleClose={handleAddModalClose}
         handleAdd={saveConsultant}
-        rowData={rowData}
+        columns={pageState?.originalData?.columns}
+      />
+      <AddColumnModal
+        show={showAddColumnModal}
+        handleClose={handleAddColumnModalClose}
+        handleAdd={addNewColumn}
       />
       <div
         className="ag-theme-alpine"

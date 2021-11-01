@@ -7,7 +7,7 @@ import {
   Col,
 } from "react-bootstrap";
 
-const AddConsultantModal = ({ show, handleClose, handleAdd, rowData }) => {
+const AddConsultantModal = ({ show, handleClose, handleAdd, columns }) => {
   const [validated, setValidated] = useState(false);
 
   const handleSubmit = (event) => {
@@ -24,28 +24,29 @@ const AddConsultantModal = ({ show, handleClose, handleAdd, rowData }) => {
       </Modal.Header>
       <Modal.Body>
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
-          {rowData &&
-            rowData.length > 0 &&
-            Object.keys(rowData[0]).map(
+          {columns &&
+            columns.length > 0 &&
+            columns.map(
               (col) =>
-                col !== "id" && (
+                col?.name !== "id" && (
                   <div>
                     <Form.Group
                       as={Col}
                       md="12"
                       controlId="validationCustomUsername"
                     >
-                      <Form.Label>{col}</Form.Label>
+                      <Form.Label>{col?.name}</Form.Label>
                       <InputGroup hasValidation>
                         <Form.Control
-                          id={col}
-                          type={col === 'Consultant Start Date' || col === 'Proposed End Date' ? 'date': 'string' }
-                          placeholder={`Enter ${col}`}
+                          id={col?.name}
+                          type={col?.type}
+                          // type={col?.name === 'Consultant Start Date' || col?.name === 'Proposed End Date' ? 'date': 'string' }
+                          placeholder={`Enter ${col?.name}`}
                           required
                           // defaultValue={"test"}
                         />
                         <Form.Control.Feedback type="invalid">
-                          {`Please enter ${col}`}
+                          {`Please enter ${col?.name}`}
                         </Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
