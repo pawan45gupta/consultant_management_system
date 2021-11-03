@@ -9,6 +9,7 @@ import axios from "axios";
 import ConfirmModal from "./Components/ConfirmModal";
 import AddConsultantModal from "./Components/AddConsultantModal";
 import AddColumnModal from "./Components/AddColumnModal";
+import RemoveColumnModal from "./Components/RemoveColumnModal";
 
 function App() {
   const [rowData, setRowData] = useState([]);
@@ -37,6 +38,7 @@ function App() {
   const [showRemoveButton, setShowRemoveButton] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddColumnModal, setShowAddColumnModal] = useState(false);
+  const [showRemoveColumnModal, setShowRemoveColumnModal] = useState(false);
 
   const onGridReady = (params) => {
     setGridApi(params.api);
@@ -123,12 +125,15 @@ function App() {
     data = JSON.parse(data && data[0]?.data)?.rows;
     console.log("userGroup", userGroup, userGroup !== "superUser");
     if (userGroup !== "superUser") {
-      const groupArray = userGroup.split("_");
+      const groupArray = userGroup && userGroup.split("_");
       const vendorName = groupArray && groupArray.length > 0 && groupArray[0];
       console.log("vendorName", userGroup, vendorName);
-      data = data.filter(
-        (row) => row["EDA Vendor"]?.toLowerCase() === vendorName?.toLowerCase()
-      );
+      data =
+        data &&
+        data.filter(
+          (row) =>
+            row["EDA Vendor"]?.toLowerCase() === vendorName?.toLowerCase()
+        );
     }
     setRowData(data);
     setPageState({
@@ -161,7 +166,8 @@ function App() {
     pageState?.originalData?.columns.forEach((col) => {
       if (col?.name !== "id") {
         item[col?.name] =
-          document.getElementById(col?.name) && document.getElementById(col?.name).value;
+          document.getElementById(col?.name) &&
+          document.getElementById(col?.name).value;
       }
     });
     if (
@@ -194,12 +200,15 @@ function App() {
 
   const addNewColumn = async () => {
     let item = {
-      "name": null,
-      "type": null,
-      "validations":[]
+      name: null,
+      type: null,
+      validations: [],
     };
-    item["name"] = document.getElementById("ColumnName") && document.getElementById("ColumnName")?.value;
-    item["type"] = document.getElementById("type") && document.getElementById("type")?.value;
+    item["name"] =
+      document.getElementById("ColumnName") &&
+      document.getElementById("ColumnName")?.value;
+    item["type"] =
+      document.getElementById("type") && document.getElementById("type")?.value;
 
     pageState?.originalData?.columns.push(item);
 
@@ -216,31 +225,34 @@ function App() {
       setShowAddColumnModal(false);
       fetchData();
     }
-  }
-
-  const removeConsultant = () => {
-    setShow(true);
   };
 
-  // const actionCellRenderer(params) {
-  // console.log('params', params);
-  //   let eGui = document.createElement("div");
-  //   let editingCells = params.api.getEditingCells();
-  //   // checks if the rowIndex matches in at least one of the editing cells
-  //   let isCurrentRowEditing = editingCells.some((cell) => {
-  //     return cell.rowIndex === params.node.rowIndex;
-  //     });
-  //   if (isCurrentRowEditing) {
-  //       eGui.innerHTML = `
-  //           <Button variant="primary" onClick={${addConsultant}}>Edit</Button>
-  //           <Button variant="secondary" onClick={${addConsultant}}>Cancel</Button>
-  //           `;
-  //   } else {
-  //   eGui.innerHTML = `
-  //   <Button variant="primary" onClick={${addConsultant}}>Edit</Button>`;
-  // }
-  // return eGui;
-  // }
+  const removeColumn = async () => {
+    const removedColumn =
+      document.getElementById("removedColumnName") &&
+      document.getElementById("removedColumnName")?.value;
+
+    pageState.originalData.columns = pageState?.originalData?.columns?.filter(
+      (item) => item?.name !== removedColumn
+    );
+
+    const objData = {
+      id: pageState?.originalId,
+      data: JSON.stringify({
+        columns: pageState?.originalData?.columns,
+        rows: pageState?.originalData?.rows,
+      }),
+    };
+    const res = await updateValue(objData);
+    if (res.status === 200) {
+      setShowRemoveColumnModal(false);
+      fetchData();
+    }
+  };
+
+  const removeConsultant = () => {
+    setShowRemoveColumnModal(true);
+  };
 
   const onSelectionChanged = () => {
     var selectedRows = gridApi.getSelectedRows();
@@ -277,6 +289,8 @@ function App() {
 
   const handleAddColumnModalClose = () => setShowAddColumnModal(false);
 
+  const handleRemoveColumnModalClose = () => setShowRemoveColumnModal(false);
+
   console.log(
     "rowData",
     rowData,
@@ -292,14 +306,17 @@ function App() {
         <Button variant="primary" className={"m-2"} onClick={addConsultant}>
           Add Consultant
         </Button>
-        <Button variant="primary" className={"m-2"} onClick={addColumn}>
-          Add New Column
-        </Button>
         {showRemoveButton && (
           <Button variant="danger" className={"m-2"} onClick={removeConsultant}>
             Remove Consultant
           </Button>
         )}
+        <Button variant="primary" className={"m-2"} onClick={addColumn}>
+          Add New Column
+        </Button>
+        <Button variant="danger" className={"m-2"} onClick={removeConsultant}>
+          Remove Column
+        </Button>
         <Button variant="primary" className="m-2" onClick={exportToCsv}>
           Export to CSV
         </Button>
@@ -320,6 +337,12 @@ function App() {
         show={showAddColumnModal}
         handleClose={handleAddColumnModalClose}
         handleAdd={addNewColumn}
+      />
+      <RemoveColumnModal
+        show={showRemoveColumnModal}
+        handleClose={handleRemoveColumnModalClose}
+        columns={pageState?.originalData?.columns}
+        handleRemove={removeColumn}
       />
       <div
         className="ag-theme-alpine"
