@@ -250,9 +250,13 @@ function App() {
     }
   };
 
-  const removeConsultant = () => {
+  const removeColumnConsultant = () => {
     setShowRemoveColumnModal(true);
   };
+
+  const removeConsultant = () => {
+    setShow(true);
+  }
 
   const onSelectionChanged = () => {
     var selectedRows = gridApi.getSelectedRows();
@@ -314,7 +318,7 @@ function App() {
         <Button variant="primary" className={"m-2"} onClick={addColumn}>
           Add New Column
         </Button>
-        <Button variant="danger" className={"m-2"} onClick={removeConsultant}>
+        <Button variant="danger" className={"m-2"} onClick={removeColumnConsultant}>
           Remove Column
         </Button>
         <Button variant="primary" className="m-2" onClick={exportToCsv}>

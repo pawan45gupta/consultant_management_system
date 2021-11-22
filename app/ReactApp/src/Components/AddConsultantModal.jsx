@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Modal,
-  InputGroup,
-  Form,
-  Col,
-} from "react-bootstrap";
+import { Button, Modal, InputGroup, Form, Col } from "react-bootstrap";
 
 const AddConsultantModal = ({ show, handleClose, handleAdd, columns }) => {
   const [validated, setValidated] = useState(false);
@@ -37,14 +31,20 @@ const AddConsultantModal = ({ show, handleClose, handleAdd, columns }) => {
                     >
                       <Form.Label>{col?.name}</Form.Label>
                       <InputGroup hasValidation>
-                        <Form.Control
-                          id={col?.name}
-                          type={col?.type}
-                          // type={col?.name === 'Consultant Start Date' || col?.name === 'Proposed End Date' ? 'date': 'string' }
-                          placeholder={`Enter ${col?.name}`}
-                          required
-                          // defaultValue={"test"}
-                        />
+                        {col?.type === "dropdown" ? (
+                          <Form.Select id={col?.name} aria-label="Default select example" required={col?.validations.length > 0}>
+                            {col?.options?.map(value => <option value={value}>{value}</option>)}
+                          </Form.Select>
+                        ) : (
+                          <Form.Control
+                            id={col?.name}
+                            type={col?.type}
+                            // type={col?.name === 'Consultant Start Date' || col?.name === 'Proposed End Date' ? 'date': 'string' }
+                            placeholder={`Enter ${col?.name}`}
+                            required={col?.validations.length > 0}
+                            // defaultValue={"test"}
+                          />
+                        )}
                         <Form.Control.Feedback type="invalid">
                           {`Please enter ${col?.name}`}
                         </Form.Control.Feedback>
