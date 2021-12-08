@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { AgGridColumn, AgGridReact } from "ag-grid-react";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
@@ -10,8 +10,54 @@ import ConfirmModal from "./Components/ConfirmModal";
 import AddConsultantModal from "./Components/AddConsultantModal";
 import AddColumnModal from "./Components/AddColumnModal";
 import RemoveColumnModal from "./Components/RemoveColumnModal";
+import EditConsultantModal from "./Components/EditConsultantModal";
+import BoardingModal from "./Components/BoardingModal";
+import VPNModal from "./Components/EnableVPNModal";
 
 function App() {
+  const initialState = {
+    showEditConsultantModal: false,
+    showBoardingModal: false,
+    showVPNModal: false
+  };
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case "SHOW_EDIT_CONSULTANT_MODAL":
+        return {
+          ...state,
+          showEditConsultantModal: true,
+        };
+      case "HIDE_EDIT_CONSULTANT_MODAL":
+        return {
+          ...state,
+          showEditConsultantModal: false,
+        };
+      case "SHOW_BOARDING_MODAL":
+        return {
+          ...state,
+          showBoardingModal: true,
+        };
+      case "HIDE_BOARDING_MODAL":
+        return {
+          ...state,
+          showBoardingModal: false,
+        };
+      case "SHOW_VPN_MODAL":
+        return {
+          ...state,
+          showVPNModal: true,
+        };
+      case "HIDE_VPN_MODAL":
+        return {
+          ...state,
+          showVPNModal: false,
+        };
+      default:
+        return state;
+    }
+  };
+
+  const [state, dispatch] = useReducer(reducer, initialState);
   const [rowData, setRowData] = useState([]);
   const [pageState, setPageState] = useState({
     userGroup: "superUser",
@@ -256,7 +302,7 @@ function App() {
 
   const removeConsultant = () => {
     setShow(true);
-  }
+  };
 
   const onSelectionChanged = () => {
     var selectedRows = gridApi.getSelectedRows();
@@ -315,10 +361,35 @@ function App() {
             Remove Consultant
           </Button>
         )}
+        <Button
+          variant="warning"
+          className={"m-2"}
+          onClick={() => dispatch({ type: "SHOW_EDIT_CONSULTANT_MODAL" })}
+        >
+          Edit Consultant
+        </Button>
+        <Button
+          variant="warning"
+          className={"m-2"}
+          onClick={() => dispatch({ type: "SHOW_BOARDING_MODAL" })}
+        >
+          Offboard
+        </Button>
+        <Button
+          variant="warning"
+          className={"m-2"}
+          onClick={() => dispatch({ type: "SHOW_VPN_MODAL" })}
+        >
+          Enable/Disable VPN
+        </Button>
         <Button variant="primary" className={"m-2"} onClick={addColumn}>
           Add New Column
         </Button>
-        <Button variant="danger" className={"m-2"} onClick={removeColumnConsultant}>
+        <Button
+          variant="danger"
+          className={"m-2"}
+          onClick={removeColumnConsultant}
+        >
           Remove Column
         </Button>
         <Button variant="primary" className="m-2" onClick={exportToCsv}>
@@ -347,6 +418,18 @@ function App() {
         handleClose={handleRemoveColumnModalClose}
         columns={pageState?.originalData?.columns}
         handleRemove={removeColumn}
+      />
+      <EditConsultantModal
+        show={state.showEditConsultantModal}
+        handleClose={() => dispatch({ type: "HIDE_EDIT_CONSULTANT_MODAL" })}
+      />
+      <BoardingModal
+        show={state.showBoardingModal}
+        handleClose={() => dispatch({ type: "HIDE_BOARDING_MODAL" })}
+      />
+      <VPNModal
+        show={state.showVPNModal}
+        handleClose={() => dispatch({ type: "HIDE_VPN_MODAL" })}
       />
       <div
         className="ag-theme-alpine"
