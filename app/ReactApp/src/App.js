@@ -1,8 +1,5 @@
 import { useEffect, useReducer, useState } from "react";
 import { AgGridColumn, AgGridReact } from "ag-grid-react";
-import "ag-grid-community/dist/styles/ag-grid.css";
-import "ag-grid-community/dist/styles/ag-theme-alpine.css";
-import "./App.css";
 import Button from "react-bootstrap/Button";
 import API_END_POINT from "./config";
 import axios from "axios";
@@ -13,12 +10,16 @@ import RemoveColumnModal from "./Components/RemoveColumnModal";
 import EditConsultantModal from "./Components/EditConsultantModal";
 import BoardingModal from "./Components/BoardingModal";
 import VPNModal from "./Components/EnableVPNModal";
+import "ag-grid-community/dist/styles/ag-grid.css";
+import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+import "./App.css";
 
 function App() {
   const initialState = {
     showEditConsultantModal: false,
     showBoardingModal: false,
-    showVPNModal: false
+    showVPNModal: false,
+    showRemoveConsultantModal: false,
   };
   const reducer = (state, action) => {
     switch (action.type) {
@@ -99,27 +100,17 @@ function App() {
   };
 
   const updateValue = async (data) => {
-    return await axios.patch(
-      `${API_END_POINT}consultant/${pageState?.originalId}/`,
-      data,
-      {
-        headers: headers,
-      }
-    );
+    return await axios.patch(`${API_END_POINT}consultant/${pageState?.originalId}/`, data, {
+      headers: headers,
+    });
   };
 
   const onCellValueChanged = async (event) => {
     console.log(event);
-    console.log(
-      "onCellValueChanged: " + event.colDef.field + " = " + event.newValue
-    );
+    console.log("onCellValueChanged: " + event.colDef.field + " = " + event.newValue);
     if (event.data.id) {
-      const requiredIndex = findIndexById(
-        pageState?.originalData?.rows,
-        event.data.id
-      );
-      requiredIndex !== -1 &&
-        pageState?.originalData?.rows.splice(requiredIndex, 1);
+      const requiredIndex = findIndexById(pageState?.originalData?.rows, event.data.id);
+      requiredIndex !== -1 && pageState?.originalData?.rows.splice(requiredIndex, 1);
       pageState?.originalData?.rows.splice(requiredIndex, 0, event.data);
       const objData = {
         id: pageState?.originalId,
@@ -174,12 +165,7 @@ function App() {
       const groupArray = userGroup && userGroup.split("_");
       const vendorName = groupArray && groupArray.length > 0 && groupArray[0];
       console.log("vendorName", userGroup, vendorName);
-      data =
-        data &&
-        data.filter(
-          (row) =>
-            row["EDA Vendor"]?.toLowerCase() === vendorName?.toLowerCase()
-        );
+      data = data && data.filter((row) => row["EDA Vendor"]?.toLowerCase() === vendorName?.toLowerCase());
     }
     setRowData(data);
     setPageState({
@@ -211,18 +197,11 @@ function App() {
     let item = {};
     pageState?.originalData?.columns.forEach((col) => {
       if (col?.name !== "id") {
-        item[col?.name] =
-          document.getElementById(col?.name) &&
-          document.getElementById(col?.name).value;
+        item[col?.name] = document.getElementById(col?.name) && document.getElementById(col?.name).value;
       }
     });
-    if (
-      pageState?.originalData?.rows &&
-      pageState?.originalData?.rows.length > 0
-    ) {
-      item["id"] =
-        pageState?.originalData?.rows[pageState?.originalData?.rows.length - 1]
-          ?.id + 1;
+    if (pageState?.originalData?.rows && pageState?.originalData?.rows.length > 0) {
+      item["id"] = pageState?.originalData?.rows[pageState?.originalData?.rows.length - 1]?.id + 1;
     } else {
       item["id"] = 1;
     }
@@ -250,11 +229,8 @@ function App() {
       type: null,
       validations: [],
     };
-    item["name"] =
-      document.getElementById("ColumnName") &&
-      document.getElementById("ColumnName")?.value;
-    item["type"] =
-      document.getElementById("type") && document.getElementById("type")?.value;
+    item["name"] = document.getElementById("ColumnName") && document.getElementById("ColumnName")?.value;
+    item["type"] = document.getElementById("type") && document.getElementById("type")?.value;
 
     pageState?.originalData?.columns.push(item);
 
@@ -275,12 +251,9 @@ function App() {
 
   const removeColumn = async () => {
     const removedColumn =
-      document.getElementById("removedColumnName") &&
-      document.getElementById("removedColumnName")?.value;
+      document.getElementById("removedColumnName") && document.getElementById("removedColumnName")?.value;
 
-    pageState.originalData.columns = pageState?.originalData?.columns?.filter(
-      (item) => item?.name !== removedColumn
-    );
+    pageState.originalData.columns = pageState?.originalData?.columns?.filter((item) => item?.name !== removedColumn);
 
     const objData = {
       id: pageState?.originalId,
@@ -312,12 +285,8 @@ function App() {
   const handleClose = () => setShow(false);
   const handleDelete = async () => {
     var selectedRows = gridApi.getSelectedRows();
-    const requiredIndex = findIndexById(
-      pageState?.originalData?.rows,
-      selectedRows[0]?.id
-    );
-    requiredIndex !== -1 &&
-      pageState?.originalData?.rows.splice(requiredIndex, 1);
+    const requiredIndex = findIndexById(pageState?.originalData?.rows, selectedRows[0]?.id);
+    requiredIndex !== -1 && pageState?.originalData?.rows.splice(requiredIndex, 1);
     const objData = {
       id: pageState?.originalId,
       data: JSON.stringify({
@@ -361,58 +330,36 @@ function App() {
             Remove Consultant
           </Button>
         )}
-        <Button
-          variant="warning"
-          className={"m-2"}
-          onClick={() => dispatch({ type: "SHOW_EDIT_CONSULTANT_MODAL" })}
-        >
+        <Button variant="warning" className={"m-2"} onClick={() => dispatch({ type: "SHOW_EDIT_CONSULTANT_MODAL" })}>
           Edit Consultant
         </Button>
-        <Button
-          variant="warning"
-          className={"m-2"}
-          onClick={() => dispatch({ type: "SHOW_BOARDING_MODAL" })}
-        >
+        <Button variant="warning" className={"m-2"} onClick={() => dispatch({ type: "SHOW_BOARDING_MODAL" })}>
           Offboard
         </Button>
-        <Button
-          variant="warning"
-          className={"m-2"}
-          onClick={() => dispatch({ type: "SHOW_VPN_MODAL" })}
-        >
-          Enable/Disable VPN
+        <Button variant="warning" className={"m-2"} onClick={() => dispatch({ type: "SHOW_VPN_MODAL" })}>
+          Enable VPN
+        </Button>
+        <Button variant="warning" className={"m-2"} onClick={() => dispatch({ type: "SHOW_VPN_MODAL" })}>
+          Disable VPN
         </Button>
         <Button variant="primary" className={"m-2"} onClick={addColumn}>
           Add New Column
         </Button>
-        <Button
-          variant="danger"
-          className={"m-2"}
-          onClick={removeColumnConsultant}
-        >
+        <Button variant="danger" className={"m-2"} onClick={removeColumnConsultant}>
           Remove Column
         </Button>
         <Button variant="primary" className="m-2" onClick={exportToCsv}>
           Export to CSV
         </Button>
       </div>
-      <ConfirmModal
-        show={show}
-        handleClose={handleClose}
-        handleDelete={handleDelete}
-        handleAdd={addConsultant}
-      />
+      <ConfirmModal show={show} handleClose={handleClose} handleDelete={handleDelete} handleAdd={addConsultant} />
       <AddConsultantModal
         show={showAddModal}
         handleClose={handleAddModalClose}
         handleAdd={saveConsultant}
         columns={pageState?.originalData?.columns}
       />
-      <AddColumnModal
-        show={showAddColumnModal}
-        handleClose={handleAddColumnModalClose}
-        handleAdd={addNewColumn}
-      />
+      <AddColumnModal show={showAddColumnModal} handleClose={handleAddColumnModalClose} handleAdd={addNewColumn} />
       <RemoveColumnModal
         show={showRemoveColumnModal}
         handleClose={handleRemoveColumnModalClose}
@@ -422,19 +369,11 @@ function App() {
       <EditConsultantModal
         show={state.showEditConsultantModal}
         handleClose={() => dispatch({ type: "HIDE_EDIT_CONSULTANT_MODAL" })}
+        columns={pageState?.originalData?.columns}
       />
-      <BoardingModal
-        show={state.showBoardingModal}
-        handleClose={() => dispatch({ type: "HIDE_BOARDING_MODAL" })}
-      />
-      <VPNModal
-        show={state.showVPNModal}
-        handleClose={() => dispatch({ type: "HIDE_VPN_MODAL" })}
-      />
-      <div
-        className="ag-theme-alpine"
-        style={{ width: "100%", height: "1000px" }}
-      >
+      <BoardingModal show={state.showBoardingModal} handleClose={() => dispatch({ type: "HIDE_BOARDING_MODAL" })} />
+      <VPNModal show={state.showVPNModal} handleClose={() => dispatch({ type: "HIDE_VPN_MODAL" })} />
+      <div className="ag-theme-alpine" style={{ width: "100%", height: "1000px" }}>
         <AgGridReact
           components={{
             actionCellRenderer: ActionCellRenderer,
@@ -455,11 +394,7 @@ function App() {
           {pageState?.originalData?.columns?.map((val) => (
             <AgGridColumn
               field={val?.name}
-              pinned={
-                val?.name === "id" || val?.name === "Consultant Name"
-                  ? "left"
-                  : null
-              }
+              pinned={val?.name === "id" || val?.name === "Consultant Name" ? "left" : null}
             ></AgGridColumn>
           ))}
           {/* <AgGridColumn
